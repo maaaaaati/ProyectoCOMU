@@ -1,8 +1,8 @@
 %% Parametros Transmisor (FM + FDM)
-Fs = 500e3;              % Muestreo del modulo FDM [Hz]
+Fs = 20e3;              % Muestreo del modulo FDM [Hz]
 Ts = 1/Fs;              % Periodo de muestreo [s]
 
-fc = 100e3;             % Portadora [Hz]
+fc_tx = 100e3;             % Portadora [Hz]
 deltaf = 10e3;          % Desviacion de frecuencia [Hz]
 fc1 = 30e3;             % Subportadoras [Hz]
 fc2 = 36e3;

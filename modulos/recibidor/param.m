@@ -1,6 +1,6 @@
-fc   = 2e6;  fIF = 340e3;
-fLO  = fc + fIF;
-fimg = fc + 2*fIF;
+fc_rx   = 2e6;  fIF = 340e3;
+fLO  = fc_rx + fIF;
+fimg = fc_rx + 2*fIF;
 Fs   = 20e6; Ts = 1/Fs;
 df   = 60e3;
 D    = 20;  Fs2 = Fs/D;  Ts2 = 1/Fs2;
