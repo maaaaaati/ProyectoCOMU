@@ -1,0 +1,4 @@
+#ifndef Sistema_completo_acc_types_h_
+#define Sistema_completo_acc_types_h_
+typedef struct P_Sistema_completo_T_ P_Sistema_completo_T ;
+#endif

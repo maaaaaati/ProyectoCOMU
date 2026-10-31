@@ -1,0 +1,11 @@
+﻿-IC:\Users\matia\Downloads\ProyectoCOMU\ProyectoCOMU\modulos
+-IC:\Users\matia\Downloads\ProyectoCOMU\ProyectoCOMU\modulos\slprj\accel\Sistema_completo
+-I"C:\Program Files\MATLAB\R2026b\extern\include"
+-I"C:\Program Files\MATLAB\R2026b\simulink\include"
+-I"C:\Program Files\MATLAB\R2026b\rtw\c\src"
+-I"C:\Program Files\MATLAB\R2026b\toolbox\dsp\dsp\include"
+-I"C:\Program Files\MATLAB\R2026b\toolbox\dsp\dsp\extern\src\export\include\src"
+-I"C:\Program Files\MATLAB\R2026b\toolbox\dsp\dsp\extern\src\export\include"
+-I"C:\Program Files\MATLAB\R2026b\toolbox\shared\dsp\vision\matlab\include"
+-I"C:\Program Files\MATLAB\R2026b\toolbox\dsp\extern\src\export\include"
+-I"C:\Program Files\MATLAB\R2026b\toolbox\dsp\extern\src\export\include\src"

@@ -1,5 +1,5 @@
 param;                                  % parameters + the current phi
-out = sim('hetSuper');                  % phi doesn't affect mrx, so any value works
+out = sim('Sistema_completo');                  % phi doesn't affect mrx, so any value works
 
 mtx = squeeze(out.mtx);   mrx = squeeze(out.mrx);
 n0  = round(1e-3*Fs);
