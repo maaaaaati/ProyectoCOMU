@@ -1,7 +1,9 @@
-function radio_gui
+function radio_guiV2
 % Interfaz tipo radio para Sistema_completo.
-% El usuario ve frecuencias nominales (portadora 10 MHz, FI 1.7 MHz); el
-% modelo trabaja con las escaladas (x kEsc) que calcula sys_params.
+% Escalamiento (seccion 5 del enunciado): solo las POSICIONES se escalan
+% (portadora 10 MHz, FI 1.7 MHz -> x kEsc en el modelo). Los ANCHOS de banda
+% (audio, FDM, desviacion, Carson, filtros) son reales y no se escalan, asi
+% que los espectros se dibujan en kHz relativos a la sintonia y a la FI.
 
 cd(fileparts(mfilename('fullpath')));      % sys_params y phi.mat viven aqui
 mdl = 'Sistema_completo';
@@ -20,7 +22,7 @@ fig = uifigure('Name', 'Radio FDM / FM', 'Position', [80 60 1250 740], ...
 g = uigridlayout(fig, [1 2], 'ColumnWidth', {330, '1x'});
 
 pan = uipanel(g, 'Title', 'Sintonia', 'FontWeight', 'bold');
-gl = uigridlayout(pan, [17 2], 'RowHeight', {26, 22, 120, 26, 22, 22, 22, 22, 22, 22, 26, 100, 26, 30, 30, 30, '1x'}, ...
+gl = uigridlayout(pan, [18 2], 'RowHeight', {26, 22, 120, 26, 22, 22, 22, 22, 22, 22, 22, 26, 100, 26, 30, 30, 30, '1x'}, ...
     'ColumnWidth', {'1x', '1x'}, 'RowSpacing', 6, 'Scrollable', 'on');
 
 % Emisora: donde transmite el transmisor (la portadora seleccionable)
@@ -44,6 +46,7 @@ txtIF  = filaDato('Frec. intermedia');
 txtLO  = filaDato('Oscilador local');
 txtImg = filaDato('Frec. imagen');
 txtBW  = filaDato('Ancho Carson');
+txtDes = filaDato('Desintonia efectiva');
 
 % Canal AWGN: sin ruido la FM ignora la atenuacion de los filtros y la desintonia no se nota
 ruido = uicheckbox(gl, 'Text', 'Ruido, CNR (dB)', 'Value', true);
@@ -101,7 +104,9 @@ mostrar(knob.Value);
         fila(txtIF,  fIF);
         fila(txtLO,  frx + fIF);
         fila(txtImg, frx + 2*fIF);
-        fila(txtBW,  2*(df + fmaxFDM));
+        % Anchos: reales, sin escalar. La desintonia es la que "ven" los filtros
+        txtBW.Text  = sprintf('%.0f kHz', 2*(df + fmaxFDM)/1e3);
+        txtDes.Text = sprintf('%+.0f kHz', (frx - fc)/1e3);
     end
 
     function fila(t, fSim)
@@ -138,27 +143,31 @@ mostrar(knob.Value);
     end
 
     function graficarRF(fc, frx)
-        % Ejes en MHz nominales: escalamiento transparente para el usuario
+        % Ejes en kHz relativos: los anchos de banda se ven con su valor real
         if ~all(ismember({'stx', 'sif'}, out.who))
             error(['La simulacion no devolvio stx/sif: hay una version vieja de %s cargada en memoria. ' ...
                 'Cierrela con close_system(''%s'', 0) y vuelva a pulsar Sintonizar.'], mdl, mdl);
         end
+        % RF: 0 = frecuencia sintonizada; la franja es el filtro RF (+-150 kHz)
         [Pr, f] = pwelch(squeeze(out.stx), hann(8192), [], 8192, Fs);
-        plot(axRF, f/kEsc/1e6, 10*log10(Pr));
-        xlim(axRF, [0 20]);  xlabel(axRF, 'MHz');  ylabel(axRF, 'dB/Hz');  grid(axRF, 'on');
-        xline(axRF, fc/kEsc/1e6, 'g', 'Tx');
-        xline(axRF, frx/kEsc/1e6, 'k--', 'Rx');
-        xline(axRF, (frx + fIF)/kEsc/1e6, 'b--', 'OL');
-        xline(axRF, (frx + 2*fIF)/kEsc/1e6, 'r:', 'Imagen');
+        cla(axRF);
+        plot(axRF, (f - frx)/1e3, 10*log10(Pr));
+        xlim(axRF, [-800 800]);  ylabel(axRF, 'dB/Hz');  grid(axRF, 'on');
+        xlabel(axRF, sprintf('kHz respecto a la sintonia (%.2f MHz)', frx/kEsc/1e6));
+        xregion(axRF, -150, 150, 'FaceColor', [0.7 0.85 1]);
+        xline(axRF, 0, 'k--', 'Rx');
+        xline(axRF, (fc - frx)/1e3, 'g', 'Tx');
+        title(axRF, sprintf('Espectro RF recibido (Carson %.0f kHz)', 2*(df + fmaxFDM)/1e3));
 
-        % En FI la senal queda en fLO - fc = fIF + desintonia
+        % FI: 0 = FI; la senal queda en fLO - fc = fIF + desintonia
         [Pi, f] = pwelch(squeeze(out.sif), hann(8192), [], 8192, Fs);
         cla(axIF);
-        plot(axIF, f/kEsc/1e6, 10*log10(Pi));
-        xlim(axIF, [0 4]);  xlabel(axIF, 'MHz');  ylabel(axIF, 'dB/Hz');  grid(axIF, 'on');
-        xregion(axIF, bandaFI(1)/kEsc/1e6, bandaFI(2)/kEsc/1e6, 'FaceColor', [0.6 0.9 0.6]);
-        xline(axIF, fIF/kEsc/1e6, 'g', 'FI');
-        xline(axIF, (frx + fIF - fc)/kEsc/1e6, 'k--', 'Senal');
+        plot(axIF, (f - fIF)/1e3, 10*log10(Pi));
+        xlim(axIF, [-600 600]);  ylabel(axIF, 'dB/Hz');  grid(axIF, 'on');
+        xlabel(axIF, sprintf('kHz respecto a la FI (%.1f MHz)', fIF/kEsc/1e6));
+        xregion(axIF, (bandaFI(1) - fIF)/1e3, (bandaFI(2) - fIF)/1e3, 'FaceColor', [0.6 0.9 0.6]);
+        xline(axIF, 0, 'g', 'FI');
+        xline(axIF, (frx - fc)/1e3, 'k--', 'Senal');
     end
 
     function graficarCanal()
