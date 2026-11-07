@@ -8,10 +8,14 @@ Ts    = 1/Fs;            % Paso fijo del modelo
 L     = Fs/Fs_tx;        % Factor de interpolacion (40)
 
 %% Escalamiento RF (nominal x 1/5: 10 MHz -> 2 MHz, 1.7 MHz -> 340 kHz)
-kEsc = 1/5;              % Factor de escalamiento simulado/nominal
-fc  = 2e6;               % Portadora FM [Hz]
+% Nota: los filtros RF (+-150 kHz) y FI (Digital Filter Design, 140-540 kHz)
+% estan disenados para kEsc = 1/5; cambiar kEsc exige redisenarlos.
+kEsc   = 1/5;            % Factor de escalamiento simulado/nominal
+fcNom  = 10e6;           % Portadora FM nominal [Hz]
+fIFNom = 1.7e6;          % FI nominal [Hz]
+fc  = fcNom*kEsc;        % Portadora FM simulada [Hz] (2 MHz)
 if exist('fc_gui','var'), fc = fc_gui; end   % radio_gui fija la portadora
-fIF = 340e3;             % Frecuencia intermedia [Hz]
+fIF = fIFNom*kEsc;       % Frecuencia intermedia simulada [Hz] (340 kHz)
 df  = 60e3;              % Desviacion de frecuencia [Hz] (Carson: 2*(60+58) = 236 kHz)
 desint = 0;              % Desintonia del receptor respecto al transmisor [Hz]
 if exist('desint_gui','var'), desint = desint_gui; end
