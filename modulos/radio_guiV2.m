@@ -6,7 +6,7 @@ function radio_guiV2
 % que los espectros se dibujan en kHz relativos a la sintonia y a la FI.
 
 cd(fileparts(mfilename('fullpath')));      % sys_params y phi.mat viven aqui
-mdl = 'Sistema_completo';
+mdl = 'Sistema_completo_VR2026a';
 evalin('base', 'clear fc_gui Tsim_gui desint_gui CNR_gui; sys_params');
 P = @(name) evalin('base', name);          % leer parametros del workspace base
 kEsc = P('kEsc');  fIF = P('fIF');  df = P('df');  fsub = P('fsub');  B = P('B');
